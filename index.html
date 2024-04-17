@@ -38,9 +38,16 @@
         const onCharInput = function onCharInput() {
 
             let containsChars = function hasChars() {
-                let chars = document.getElementById('chars').value.split('');
+                let chars = document.getElementById('has_chars').value.split('');
                 return function (char) {
                     return chars.every(c => char.indexOf(c) !== -1);
+                };
+            }();
+
+            let notContainsChars = function () {
+                let chars = document.getElementById('has_not_chars').value.split('');
+                return function (char) {
+                    return chars.every(c => char.indexOf(c) === -1);
                 };
             }();
 
@@ -64,6 +71,7 @@
             changeWord(
                 words
                     .filter(containsChars)
+                    .filter(notContainsChars)
                     .filter(matchPattern)
             )
         }
@@ -76,8 +84,12 @@
 </head>
 <body class="background-gray">
 <div class="center font-size-20">
-    <label style="text-align: left">Has chars:
-        <input type="text" id="chars" maxlength="5" pattern="[a-z]" class="input width-100" oninput="onCharInput()">
+    <label>Has chars:
+        <input type="text" id="has_chars" maxlength="5" pattern="[a-z]" class="input width-100" oninput="onCharInput()">
+
+    </label>
+    <label>Has not chars:
+        <input type="text" id="has_not_chars" pattern="[a-z]" class="input width-100" oninput="onCharInput()">
     </label>
     <div>
         <label>Word: </label>
