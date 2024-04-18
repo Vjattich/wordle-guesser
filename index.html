@@ -14,8 +14,8 @@
             margin-top: 20%
         }
 
-        .background-gray {
-            background: gray;
+        .background-orange {
+            background: orange;
         }
 
         .width-100 {
@@ -53,15 +53,9 @@
 
             let matchPattern = function () {
 
-                let patternChars = [
-                    document.getElementById('char1').value,
-                    document.getElementById('char2').value,
-                    document.getElementById('char3').value,
-                    document.getElementById('char4').value,
-                    document.getElementById('char5').value
-                ]
-
-                let pattern = patternChars.map(text => text ? text : '.').join('');
+                let pattern = [document.getElementById('char1'), document.getElementById('char2'), document.getElementById('char3'), document.getElementById('char4'), document.getElementById('char5'),]
+                    .map(e => e.value ? e.value : '.')
+                    .join('');
 
                 return function (word) {
                     return word.match(pattern);
@@ -82,7 +76,7 @@
 
     </script>
 </head>
-<body class="background-gray">
+<body class="background-orange">
 <div class="center font-size-20">
     <label>Has chars:
         <input type="text" id="has_chars" maxlength="5" pattern="[a-z]" class="input width-100" oninput="onCharInput()">
