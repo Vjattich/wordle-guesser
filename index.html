@@ -9,17 +9,16 @@
             font-size: 20px;
         }
 
+        .margin-top-15p {
+            margin-top: 15%
+        }
+
         .center {
             text-align: center;
-            margin-top: 20%
         }
 
         .background-orange {
             background: orange;
-        }
-
-        .width-100 {
-            width: 100px !important;
         }
 
         .input {
@@ -36,6 +35,12 @@
             height: 25px;
             padding-top: 2px;
             margin-left: -1px;
+        }
+
+        .qr {
+            width: 100px;
+            height: 100px;
+            margin: 5px 5px 5px 5px;
         }
 
         .gray {
@@ -208,20 +213,19 @@
     </script>
 </head>
 <body class="background-orange">
-<div class="center font-size-20">
+<div class="center margin-top-15p font-size-20">
+    <div style="margin-bottom: 1%">
+        <img class="qr" src="prog_channel.png" alt="Prog channel">
+        <img class="qr" src="live_channel.png" alt="Live channel">
+    </div>
     <div id="inputs">
         <label>Word: </label>
         <div id="main">
-            <input type="text" maxlength="1" class="input 1 gray" oninput="onCharInput()" onclick="onClick(this, event)"
-                   onkeydown="onClick(this, event)">
-            <input type="text" maxlength="1" class="input 2 gray" oninput="onCharInput()" onclick="onClick(this, event)"
-                   onkeydown="onClick(this, event)">
-            <input type="text" maxlength="1" class="input 3 gray" oninput="onCharInput()" onclick="onClick(this, event)"
-                   onkeydown="onClick(this, event)">
-            <input type="text" maxlength="1" class="input 4 gray" oninput="onCharInput()" onclick="onClick(this, event)"
-                   onkeydown="onClick(this, event)">
-            <input type="text" maxlength="1" class="input 5 gray" oninput="onCharInput()" onclick="onClick(this, event)"
-                   onkeydown="onClick(this, event)">
+            <input type="text" maxlength="1" class="input 1 gray" oninput="onCharInput()" onclick="onClick(this, event)" onkeydown="onClick(this, event)">
+            <input type="text" maxlength="1" class="input 2 gray" oninput="onCharInput()" onclick="onClick(this, event)" onkeydown="onClick(this, event)">
+            <input type="text" maxlength="1" class="input 3 gray" oninput="onCharInput()" onclick="onClick(this, event)" onkeydown="onClick(this, event)">
+            <input type="text" maxlength="1" class="input 4 gray" oninput="onCharInput()" onclick="onClick(this, event)" onkeydown="onClick(this, event)">
+            <input type="text" maxlength="1" class="input 5 gray" oninput="onCharInput()" onclick="onClick(this, event)" onkeydown="onClick(this, event)">
             <button class="add" onclick="addInput()">+</button>
         </div>
     </div>
