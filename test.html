@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Test Suite</title>
+<link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.20.1.css">
+<body>
+
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="https://code.jquery.com/qunit/qunit-2.20.1.js"></script>
+<script src="index.js"></script>
+<script>
+
+    QUnit.module('page', () => {
+
+        QUnit.test('colors are same', assert => {
+            assert.deepEqual(colors, {gray: 'white', white: 'yellow', yellow: 'gray'});
+        });
+
+        QUnit.test('get chars from input', assert => {
+            let startCode = 'a'.charCodeAt(0),
+                nums = [...Array(26).keys()],
+                chars = nums.map(n => String.fromCharCode(n + startCode)),
+                inputs = chars.map(char => {
+                    let htmlInputElement = document.createElement('input');
+                    htmlInputElement.value = char
+                    htmlInputElement.classList.add('input', '1', 'yellow')
+                    return htmlInputElement;
+                }),
+                charsWithPosition = new Set(chars.map(char => {
+                    return {char: char, position: '1'}
+                }))
+
+            assert.deepEqual(charsWithPosition, getChars(inputs).exact);
+        });
+
+        QUnit.test('get chars from input with some empty inputs', assert => {
+            //GIVEN
+            let startCode = 'a'.charCodeAt(0),
+                nums = [...Array(26).keys()],
+                skipChars = ['a', 'b', 'c', 'x', 'y', 'z'],
+                chars = nums.map(n => String.fromCharCode(n + startCode)),
+                inputs = chars.map(char => {
+                    let htmlInputElement = document.createElement('input');
+                    htmlInputElement.value = skipChars.indexOf(char) > 0 ? '' : char
+                    htmlInputElement.classList.add('input', '1', 'yellow')
+                    return htmlInputElement;
+                }),
+                charsWithPosition = new Set(chars.map(char => {
+                    return {char: char, position: '1'}
+                }))
+
+            //WHEN
+            let result = getChars(inputs).exact;
+
+            //THEN
+            assert.notDeepEqual(charsWithPosition, result);
+        });
+
+        QUnit.test('get chars and chars sorted by color', assert => {
+            //GIVEN
+            let color = {'0': 'yellow', '1': 'yellow', '2': 'white', '3': 'white', '4': 'gray', '5': 'gray'},
+                chars = ['a', 'b', 'c', 'x', 'y', 'z'].map((n, i) => ({char: n, color: color[i]})),
+                inputs = chars.map(o => {
+                    let htmlInputElement = document.createElement('input');
+                    htmlInputElement.value = o.char
+                    htmlInputElement.classList.add('input', '1', o.color)
+                    return htmlInputElement;
+                });
+
+            //WHEN
+            let result = getChars(inputs);
+
+            //THEN
+            assert.deepEqual(
+                {
+                    exact: new Set([{char: 'a', position: '1'}, {char: 'b', position: '1'}]),
+                    contains: new Set([{char: 'c', position: '1'}, {char: 'x', position: '1'}]),
+                    notContains: new Set([{char: 'y', position: '1'}, {char: 'z', position: '1'}])
+                },
+                result
+            );
+        });
+
+        QUnit.test('get words NOT CONTAINS filter function', assert => {
+            //GIVEN
+            let chars = new Set([{char: 'а', position: '5'}, {char: 'т', position: '5'}]),
+                words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
+
+            //WHEN
+            let result = notContainsChars(chars);
+
+            //THEN
+            assert.deepEqual(
+                ['слово'],
+                words.filter(result)
+            );
+        });
+
+        QUnit.test('get words CONTAINS filter function', assert => {
+            //GIVEN
+            let chars = new Set([{char: 'а', position: '1'}, {char: 'т', position: '2'}]),
+                words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
+
+            //WHEN
+            let result = containsChars(chars);
+
+            //THEN
+            assert.deepEqual(
+                ['толпа'],
+                words.filter(result)
+            );
+        });
+
+        QUnit.test('get words EXACT filter function', assert => {
+            //GIVEN
+            let chars = new Set([{char: 'к', position: '4'}]),
+                words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
+
+            //WHEN
+            let result = exactChar(chars);
+
+            //THEN
+            assert.deepEqual(
+                ['палка'],
+                words.filter(result)
+            );
+        });
+
+        QUnit.test('on click 1 time effect test', assert => {
+            //GIVEN
+            let input = document.createElement('input');
+
+            input.value = 'a'
+            input.classList.add('input', '1', 'gray')
+
+            //WHEN
+            onClick(input)
+
+            //THEN
+            assert.equal(
+                'white',
+                input.classList[2]
+            );
+        });
+
+        QUnit.test('on click 2 time effect test', assert => {
+            //GIVEN
+            let input = document.createElement('input');
+
+            input.value = 'a'
+            input.classList.add('input', '1', 'gray')
+
+            //WHEN
+            onClick(input)
+            onClick(input)
+
+            //THEN
+            assert.equal(
+                'yellow',
+                input.classList[2]
+            );
+        });
+
+        QUnit.test('on click 3 time effect test', assert => {
+            //GIVEN
+            let input = document.createElement('input');
+
+            input.value = 'a'
+            input.classList.add('input', '1', 'gray')
+
+            //WHEN
+            onClick(input)
+            onClick(input)
+            onClick(input)
+
+            //THEN
+            assert.equal(
+                'gray',
+                input.classList[2]
+            );
+        });
+
+        QUnit.test('add input test', assert => {
+            //GIVEN
+            let main = document.createElement('div')
+
+            let inputChild_1 = document.createElement('input')
+            inputChild_1.classList.add('input', '1', 'yellow')
+
+            let inputChild_2 = document.createElement('input')
+            inputChild_2.classList.add('input', '2', 'white')
+
+            let inputChild_3 = document.createElement('input')
+            inputChild_3.classList.add('input', '3', 'gray')
+
+            main.appendChild(inputChild_1);
+            main.appendChild(inputChild_2);
+            main.appendChild(inputChild_3);
+
+            let inputs = document.createElement('div')
+            inputs.appendChild(main);
+
+            //WHEN
+            addInput(main, inputs)
+
+            //THEN
+            assert.equal(
+                6,
+                inputs.childNodes[0].childNodes.length + inputs.childNodes[1].childNodes.length
+            );
+        });
+
+    });
+
+</script>
+</body>
