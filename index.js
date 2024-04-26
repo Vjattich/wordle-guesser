@@ -6,26 +6,50 @@ const colors = {
     yellow: 'gray'
 }
 
-let nextInput = function (self) {
-    return getSibling(self, true);
+const getColor = function (element) {
+    let colorClassPosition = 2;
+    let color = element.classList[colorClassPosition];
+    return {
+        value: color,
+        isYellow: color === 'yellow',
+        isNotYellow: color !== 'yellow',
+        isWhite: color === 'white',
+        isGray: color === 'gray',
+    }
 };
 
-let prevInput = function (self) {
-    return getSibling(self, false);
+const isInput = function (element) {
+    return element.tagName === 'INPUT';
+}
+
+const isNotInput = function (element) {
+    return !isInput(element);
+}
+
+const isBackspaceEvent = function (event) {
+    return event.inputType === 'deleteContentBackward';
 };
 
-let getSibling = function (self, isNext) {
+const getSibling = function (self, isNext) {
 
     if (!self) {
         return;
     }
 
     let element = isNext ? self.nextElementSibling : self.previousElementSibling;
-    if (!element || element.tagName !== 'INPUT') {
+    if (!element || isNotInput(element)) {
         return self;
     }
 
     return element;
+};
+
+const nextInput = function (self) {
+    return getSibling(self, true);
+};
+
+const prevInput = function (self) {
+    return getSibling(self, false);
 };
 
 const inputEvent = function (self, event) {
@@ -51,42 +75,40 @@ const addInput = function addInput(main) {
     let clone = main.cloneNode(true);
 
     clone.childNodes.forEach(s => {
-        if (s.tagName === 'INPUT') {
-            if (s.classList[2] !== 'yellow') {
-                s.value = null;
-                s.classList.replace('white', 'gray')
-            }
+        if (isInput(s) && getColor(s).isNotYellow) {
+            s.value = null;
+            s.classList.replace('white', 'gray')
         }
     })
 
     main.parentNode.appendChild(clone);
 };
 
-let getChars = function (inputs) {
+const getChars = function (inputs) {
     return Array.from(inputs)
         .filter(input => input.value != '')
         .map(input => {
             return {
                 char: input.value,
                 position: input.classList[1],
-                color: input.classList[2]
+                color: getColor(input)
             }
         })
         .sort((a, b) => {
-            return b.color.length - a.color.length
+            return b.color.value.length - a.color.value.length
         })
         .reduce((acc, e) => {
 
             let color = e.color;
             delete e.color
 
-            if (color === 'yellow') {
+            if (color.isYellow) {
                 acc.exact.add(e)
             }
-            if (color === 'white') {
+            if (color.isWhite) {
                 acc.contains.add(e)
             }
-            if (color === 'gray'
+            if (color.isGray
                 && Array.from(acc.contains).some(c => c.char === e.char) === false
                 && Array.from(acc.exact).some(c => c.char === e.char) === false
             ) {
@@ -96,14 +118,14 @@ let getChars = function (inputs) {
         }, {exact: new Set(), contains: new Set(), notContains: new Set()});
 }
 
-let notContainsChars = function (notContainsChars) {
+const notContainsChars = function (notContainsChars) {
     let letters = Array.from(notContainsChars);
     return function (word) {
         return letters.every(c => word.indexOf(c.char) === -1);
     };
 };
 
-let containsChars = function (containsChars) {
+const containsChars = function (containsChars) {
 
     let letters = Array.from(containsChars).reduce(function (acc, letter) {
         let accElement = acc[letter.position];
@@ -140,7 +162,7 @@ let containsChars = function (containsChars) {
     };
 };
 
-let exactChar = function (exactChars) {
+const exactChar = function (exactChars) {
 
     let pattern = Array.from(exactChars).reduce(function (acc, letter) {
         acc[letter.position] = letter.char;
@@ -161,7 +183,6 @@ let exactChar = function (exactChars) {
     };
 };
 
-
 const onCharInput = function onCharInput(self, event) {
 
     let chars = getChars(document.getElementsByClassName('input'));
@@ -178,7 +199,7 @@ const onCharInput = function onCharInput(self, event) {
     }
 
     if ('абвгдеёжзийклмнопрстуфхцчшщъыьэюя'.indexOf(event.data) !== -1 || event.inputType === 'deleteContentBackward') {
-        let element = event.inputType === 'deleteContentBackward' ? prevInput(self) : nextInput(self);
+        let element = isBackspaceEvent(event) ? prevInput(self) : nextInput(self);
         element.focus();
     }
 

@@ -268,6 +268,80 @@
             );
         });
 
+        QUnit.test('is input', assert => {
+            //GIVEN
+            let input = document.createElement('input'),
+                button = document.createElement('button');
+
+            //WHEN
+            let result_1 = isInput(input),
+                result_2 = isInput(button),
+                result_3 = isNotInput(button),
+                result_4 = isNotInput(input);
+
+            //THEN
+            assert.equal(
+                true,
+                result_1
+            );
+            assert.equal(
+                false,
+                result_2
+            );
+            assert.equal(
+                true,
+                result_3
+            );
+            assert.equal(
+                false,
+                result_4
+            );
+        });
+
+        QUnit.test('is backspace input event', assert => {
+            //GIVEN
+            let event = {inputType: 'deleteContentBackward'};
+
+            //WHEN
+            let result_1 = isBackspaceEvent(event);
+
+            //THEN
+            assert.equal(true, result_1);
+        });
+
+        QUnit.test('get color', assert => {
+            //GIVEN
+            let input_yellow = document.createElement('input'),
+                input_white = document.createElement('input'),
+                input_gray = document.createElement('input'),
+                input_null = document.createElement('input');
+
+            input_yellow.classList.add('input', '1', 'yellow')
+            input_white.classList.add('input', '2', 'white')
+            input_gray.classList.add('input', '3', 'gray')
+            input_null.classList.add('input', '4')
+
+            //WHEN
+            let result_1 = getColor(input_yellow),
+                result_2 = getColor(input_white),
+                result_3 = getColor(input_gray),
+                result_4 = getColor(input_null);
+
+            //THEN
+            assert.equal(true, result_1.isYellow);
+            assert.equal(false, result_1.isNotYellow);
+            assert.equal('yellow', result_1.value);
+            assert.equal(true, result_2.isWhite);
+            assert.equal('white', result_2.value);
+            assert.equal(true, result_3.isGray);
+            assert.equal('gray', result_3.value);
+            assert.equal(false, result_4.isYellow);
+            assert.equal(true, result_4.isNotYellow);
+            assert.equal(false, result_4.isGray);
+            assert.equal(false, result_4.isWhite);
+            assert.equal(null, result_4.value);
+        });
+
     });
 
 </script>
