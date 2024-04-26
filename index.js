@@ -6,18 +6,39 @@ const colors = {
     yellow: 'gray'
 }
 
+let nextInput = function (self) {
+    return getSibling(self, true);
+};
+
+let prevInput = function (self) {
+    return getSibling(self, false);
+};
+
+let getSibling = function (self, isNext) {
+
+    if (!self) {
+        return;
+    }
+
+    let element = isNext ? self.nextElementSibling : self.previousElementSibling;
+    if (!element || element.tagName !== 'INPUT') {
+        return self;
+    }
+
+    return element;
+};
+
 const inputEvent = function (self, event) {
 
     if (!self.value) {
         return;
     }
 
-    if (event.keyCode !== 13 && event.type !== 'click') {
-        return;
+    if (event.keyCode === 13 || event.type === 'click') {
+        onClick(self, event);
+        onCharInput()
     }
 
-    onClick(self, event);
-    onCharInput()
 };
 
 const onClick = function (self) {
@@ -140,7 +161,8 @@ let exactChar = function (exactChars) {
     };
 };
 
-const onCharInput = function onCharInput() {
+
+const onCharInput = function onCharInput(self, event) {
 
     let chars = getChars(document.getElementsByClassName('input'));
 
@@ -150,6 +172,16 @@ const onCharInput = function onCharInput() {
             .filter(containsChars(chars.contains))
             .filter(exactChar(chars.exact))
     )
+
+    if (!event) {
+        return;
+    }
+
+    if ('абвгдеёжзийклмнопрстуфхцчшщъыьэюя'.indexOf(event.data) !== -1 || event.inputType === 'deleteContentBackward') {
+        let element = event.inputType === 'deleteContentBackward' ? prevInput(self) : nextInput(self);
+        element.focus();
+    }
+
 }
 
 const changeWord = function (words) {

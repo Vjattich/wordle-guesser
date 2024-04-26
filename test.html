@@ -193,9 +193,7 @@
             let inputChild_3 = document.createElement('input')
             inputChild_3.classList.add('input', '3', 'gray')
 
-            main.appendChild(inputChild_1);
-            main.appendChild(inputChild_2);
-            main.appendChild(inputChild_3);
+            main.append(inputChild_1, inputChild_2, inputChild_3);
 
             let inputs = document.createElement('div')
             inputs.appendChild(main);
@@ -207,6 +205,66 @@
             assert.equal(
                 6,
                 inputs.childNodes[0].childNodes.length + inputs.childNodes[1].childNodes.length
+            );
+        });
+
+        QUnit.test('select next input', assert => {
+            //GIVEN
+            let main = document.createElement('main'),
+                input_1 = document.createElement('input'),
+                input_2 = document.createElement('input'),
+                button = document.createElement('button');
+
+            main.append(input_1, input_2, button);
+
+            input_1.focus()
+
+            //WHEN
+            let element_1 = nextInput(input_1),
+                element_2 = nextInput(element_1);
+
+            //THEN
+            assert.deepEqual(
+                input_2,
+                element_1
+            );
+
+            assert.deepEqual(
+                input_2,
+                element_2
+            );
+        });
+
+        QUnit.test('select prev input', assert => {
+            //GIVEN
+            let main = document.createElement('main'),
+                input_1 = document.createElement('input'),
+                input_2 = document.createElement('input'),
+                input_3 = document.createElement('input');
+
+            main.append(input_1, input_2, input_3);
+
+            input_1.focus()
+
+            //WHEN
+            let element_1 = prevInput(input_3),
+                element_2 = prevInput(element_1),
+                element_3 = prevInput(element_2);
+
+            //THEN
+            assert.deepEqual(
+                input_2,
+                element_1
+            );
+
+            assert.deepEqual(
+                input_1,
+                element_2
+            );
+
+            assert.deepEqual(
+                input_1,
+                element_3
             );
         });
 
