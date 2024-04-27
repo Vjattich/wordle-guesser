@@ -7,8 +7,8 @@ const colors = {
 }
 
 const getColor = function (element) {
-    let colorClassPosition = 2;
-    let color = element.classList[colorClassPosition];
+    let colorClassPosition = 2,
+        color = element.classList ? element.classList[colorClassPosition] : undefined;
     return {
         value: color,
         isYellow: color === 'yellow',
@@ -18,16 +18,32 @@ const getColor = function (element) {
     }
 };
 
-const isInput = function (element) {
-    return element.tagName === 'INPUT';
-}
+const toElement = function (e) {
+    let positionClassPosition = 1,
+        isInput = e.tagName === 'INPUT',
+        isButton = e.tagName === 'BUTTON',
+        isEmpty = e.value == '';
+    return {
+        value: e,
+        char: e.value,
+        isEmpty: isEmpty,
+        isNotEmpty: !isEmpty,
+        position: e.classList ? e.classList[positionClassPosition] : undefined,
+        isInput: isInput,
+        isNotInput: !isInput,
+        isButton: isButton,
+        color: getColor(e)
+    }
+};
 
-const isNotInput = function (element) {
-    return !isInput(element);
-}
-
-const isBackspaceEvent = function (event) {
-    return event.inputType === 'deleteContentBackward';
+const toEvent = function (e) {
+    return {
+        value: e,
+        isBackspaceEvent: e.inputType === 'deleteContentBackward',
+        isEnterPress: e.keyCode === 13,
+        isClick: e.type === 'click',
+        isLetterPress: 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'.indexOf(e.data) !== -1
+    }
 };
 
 const getSibling = function (self, isNext) {
@@ -36,12 +52,19 @@ const getSibling = function (self, isNext) {
         return;
     }
 
-    let element = isNext ? self.nextElementSibling : self.previousElementSibling;
-    if (!element || isNotInput(element)) {
+    let sibling = isNext ? self.nextElementSibling : self.previousElementSibling;
+
+    if (!sibling) {
         return self;
     }
 
-    return element;
+    let element = toElement(sibling)
+
+    if (element.isNotInput) {
+        return self;
+    }
+
+    return element.value;
 };
 
 const nextInput = function (self) {
@@ -52,14 +75,16 @@ const prevInput = function (self) {
     return getSibling(self, false);
 };
 
-const inputEvent = function (self, event) {
+const inputEvent = function (self, e) {
 
     if (!self.value) {
         return;
     }
 
-    if (event.keyCode === 13 || event.type === 'click') {
-        onClick(self, event);
+    let event = toEvent(e);
+
+    if (event.isEnterPress || event.isClick) {
+        onClick(self);
         onCharInput()
     }
 
@@ -75,7 +100,10 @@ const addInput = function addInput(main) {
     let clone = main.cloneNode(true);
 
     clone.childNodes.forEach(s => {
-        if (isInput(s) && getColor(s).isNotYellow) {
+
+        let element = toElement(s);
+
+        if (element.isInput && element.color.isNotYellow) {
             s.value = null;
             s.classList.replace('white', 'gray')
         }
@@ -86,33 +114,31 @@ const addInput = function addInput(main) {
 
 const getChars = function (inputs) {
     return Array.from(inputs)
-        .filter(input => input.value != '')
-        .map(input => {
-            return {
-                char: input.value,
-                position: input.classList[1],
-                color: getColor(input)
-            }
-        })
+        .map(e => toElement(e))
+        .filter(input => input.isNotEmpty)
         .sort((a, b) => {
             return b.color.value.length - a.color.value.length
         })
         .reduce((acc, e) => {
 
             let color = e.color;
-            delete e.color
+
+            let obj = {
+                char: e.char,
+                position: e.position
+            };
 
             if (color.isYellow) {
-                acc.exact.add(e)
+                acc.exact.add(obj)
             }
             if (color.isWhite) {
-                acc.contains.add(e)
+                acc.contains.add(obj)
             }
             if (color.isGray
                 && Array.from(acc.contains).some(c => c.char === e.char) === false
                 && Array.from(acc.exact).some(c => c.char === e.char) === false
             ) {
-                acc.notContains.add(e);
+                acc.notContains.add(obj);
             }
             return acc;
         }, {exact: new Set(), contains: new Set(), notContains: new Set()});
@@ -183,7 +209,9 @@ const exactChar = function (exactChars) {
     };
 };
 
-const onCharInput = function onCharInput(self, event) {
+
+//todo test
+const onCharInput = function onCharInput(self, e) {
 
     let chars = getChars(document.getElementsByClassName('input'));
 
@@ -194,12 +222,14 @@ const onCharInput = function onCharInput(self, event) {
             .filter(exactChar(chars.exact))
     )
 
-    if (!event) {
+    if (!e) {
         return;
     }
 
-    if ('абвгдеёжзийклмнопрстуфхцчшщъыьэюя'.indexOf(event.data) !== -1 || event.inputType === 'deleteContentBackward') {
-        let element = isBackspaceEvent(event) ? prevInput(self) : nextInput(self);
+    let event = toEvent(e);
+
+    if (event.isLetterPress || event.isBackspaceEvent) {
+        let element = event.isBackspaceEvent ? prevInput(self) : nextInput(self);
         element.focus();
     }
 

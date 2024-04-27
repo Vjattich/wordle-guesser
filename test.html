@@ -193,17 +193,21 @@
             let inputChild_3 = document.createElement('input')
             inputChild_3.classList.add('input', '3', 'gray')
 
-            main.append(inputChild_1, inputChild_2, inputChild_3);
+            let button = document.createElement('button')
+            let label = document.createElement('label')
+            label.innerText = 'Word'
+
+            main.append(label, inputChild_1, inputChild_2, inputChild_3, button);
 
             let inputs = document.createElement('div')
             inputs.appendChild(main);
 
             //WHEN
-            addInput(main, inputs)
+            addInput(main)
 
             //THEN
             assert.equal(
-                6,
+                10,
                 inputs.childNodes[0].childNodes.length + inputs.childNodes[1].childNodes.length
             );
         });
@@ -268,45 +272,120 @@
             );
         });
 
-        QUnit.test('is input', assert => {
+        QUnit.test('get element object', assert => {
             //GIVEN
             let input = document.createElement('input'),
                 button = document.createElement('button');
 
+            input.value = 'a';
+            input.classList.add('input', '1', 'yellow')
+
             //WHEN
-            let result_1 = isInput(input),
-                result_2 = isInput(button),
-                result_3 = isNotInput(button),
-                result_4 = isNotInput(input);
+            let result_1 = toElement(input),
+                result_2 = toElement(button);
 
             //THEN
-            assert.equal(
-                true,
+            assert.deepEqual(
+                {
+                    value: input,
+                    char: 'a',
+                    position: '1',
+                    isInput: true,
+                    isEmpty: false,
+                    isNotEmpty: true,
+                    isNotInput: false,
+                    isButton: false,
+                    color: {
+                        value: 'yellow',
+                        isYellow: true,
+                        isNotYellow: false,
+                        isWhite: false,
+                        isGray: false,
+                    },
+                },
                 result_1
             );
-            assert.equal(
-                false,
+
+            assert.deepEqual(
+                {
+                    value: button,
+                    char: '',
+                    isInput: false,
+                    isEmpty: true,
+                    position: undefined,
+                    isNotEmpty: false,
+                    isNotInput: true,
+                    isButton: true,
+                    color: {
+                        value: undefined,
+                        isYellow: false,
+                        isNotYellow: true,
+                        isWhite: false,
+                        isGray: false,
+                    }
+                },
                 result_2
             );
-            assert.equal(
-                true,
-                result_3
-            );
-            assert.equal(
-                false,
-                result_4
-            );
+
         });
 
-        QUnit.test('is backspace input event', assert => {
+        QUnit.test('get event object', assert => {
             //GIVEN
-            let event = {inputType: 'deleteContentBackward'};
+            let e_1 = {inputType: 'deleteContentBackward'},
+                e_2 = {type: 'click'},
+                e_3 = {keyCode: 13},
+                e_4 = {data: 'а'};
 
             //WHEN
-            let result_1 = isBackspaceEvent(event);
+            let result_1 = toEvent(e_1),
+                result_2 = toEvent(e_2),
+                result_3 = toEvent(e_3),
+                result_4 = toEvent(e_4);
 
             //THEN
-            assert.equal(true, result_1);
+            assert.deepEqual(
+                {
+                    value: e_1,
+                    isBackspaceEvent: true,
+                    isEnterPress: false,
+                    isClick: false,
+                    isLetterPress: false
+                },
+                result_1
+            );
+
+            assert.deepEqual(
+                {
+                    value: e_2,
+                    isBackspaceEvent: false,
+                    isEnterPress: false,
+                    isClick: true,
+                    isLetterPress: false
+                },
+                result_2
+            );
+
+            assert.deepEqual(
+                {
+                    value: e_3,
+                    isBackspaceEvent: false,
+                    isEnterPress: true,
+                    isClick: false,
+                    isLetterPress: false
+                },
+                result_3
+            );
+
+            assert.deepEqual(
+                {
+                    value: e_4,
+                    isBackspaceEvent: false,
+                    isEnterPress: false,
+                    isClick: false,
+                    isLetterPress: true
+                },
+                result_4
+            );
         });
 
         QUnit.test('get color', assert => {
