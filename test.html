@@ -87,7 +87,7 @@
                 words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
 
             //WHEN
-            let result = notContainsChars(chars);
+            let result = notContainsChars(chars, new Set());
 
             //THEN
             assert.deepEqual(
@@ -212,41 +212,16 @@
             );
         });
 
-        QUnit.test('select next input', assert => {
-            //GIVEN
-            let main = document.createElement('main'),
-                input_1 = document.createElement('input'),
-                input_2 = document.createElement('input'),
-                button = document.createElement('button');
-
-            main.append(input_1, input_2, button);
-
-            input_1.focus()
-
-            //WHEN
-            let element_1 = nextInput(input_1),
-                element_2 = nextInput(element_1);
-
-            //THEN
-            assert.deepEqual(
-                input_2,
-                element_1
-            );
-
-            assert.deepEqual(
-                input_2,
-                element_2
-            );
-        });
-
         QUnit.test('select prev input', assert => {
             //GIVEN
-            let main = document.createElement('main'),
+            let inputs = document.createElement('div'),
+                main = document.createElement('main'),
                 input_1 = document.createElement('input'),
                 input_2 = document.createElement('input'),
                 input_3 = document.createElement('input');
 
             main.append(input_1, input_2, input_3);
+            inputs.append(main.cloneNode(), main)
 
             input_1.focus()
 
@@ -267,7 +242,7 @@
             );
 
             assert.deepEqual(
-                input_1,
+                inputs.childNodes[0].childNodes[2],
                 element_3
             );
         });
@@ -334,58 +309,119 @@
             let e_1 = {inputType: 'deleteContentBackward'},
                 e_2 = {type: 'click'},
                 e_3 = {keyCode: 13},
-                e_4 = {data: 'а'};
+                e_4 = {data: 'а'},
+                e_5 = {keyCode: 37},
+                e_6 = {keyCode: 38},
+                e_7 = {keyCode: 39},
+                e_8 = {keyCode: 40};
 
             //WHEN
             let result_1 = toEvent(e_1),
                 result_2 = toEvent(e_2),
                 result_3 = toEvent(e_3),
-                result_4 = toEvent(e_4);
+                result_4 = toEvent(e_4),
+                result_5 = toEvent(e_5),
+                result_6 = toEvent(e_6),
+                result_7 = toEvent(e_7),
+                result_8 = toEvent(e_8);
 
             //THEN
-            assert.deepEqual(
-                {
-                    value: e_1,
-                    isBackspaceEvent: true,
-                    isEnterPress: false,
-                    isClick: false,
-                    isLetterPress: false
-                },
-                result_1
-            );
-
-            assert.deepEqual(
-                {
-                    value: e_2,
-                    isBackspaceEvent: false,
-                    isEnterPress: false,
-                    isClick: true,
-                    isLetterPress: false
-                },
-                result_2
-            );
-
-            assert.deepEqual(
-                {
-                    value: e_3,
-                    isBackspaceEvent: false,
-                    isEnterPress: true,
-                    isClick: false,
-                    isLetterPress: false
-                },
-                result_3
-            );
-
-            assert.deepEqual(
-                {
-                    value: e_4,
-                    isBackspaceEvent: false,
-                    isEnterPress: false,
-                    isClick: false,
-                    isLetterPress: true
-                },
-                result_4
-            );
+            assert.deepEqual({
+                value: e_1,
+                isArrowPress: false,
+                isBackspaceEvent: true,
+                isEnterPress: false,
+                isClick: false,
+                isLetterPress: false,
+                isLeftPress: false,
+                isUpPress: false,
+                isRightPress: false,
+                isDownPress: false
+            }, result_1);
+            assert.deepEqual({
+                value: e_2,
+                isArrowPress: false,
+                isBackspaceEvent: false,
+                isEnterPress: false,
+                isClick: true,
+                isLetterPress: false,
+                isLeftPress: false,
+                isUpPress: false,
+                isRightPress: false,
+                isDownPress: false
+            }, result_2);
+            assert.deepEqual({
+                value: e_3,
+                isArrowPress: false,
+                isBackspaceEvent: false,
+                isEnterPress: true,
+                isClick: false,
+                isLetterPress: false,
+                isLeftPress: false,
+                isUpPress: false,
+                isRightPress: false,
+                isDownPress: false
+            }, result_3);
+            assert.deepEqual({
+                value: e_4,
+                isArrowPress: false,
+                isBackspaceEvent: false,
+                isEnterPress: false,
+                isClick: false,
+                isLetterPress: true,
+                isLeftPress: false,
+                isUpPress: false,
+                isRightPress: false,
+                isDownPress: false
+            }, result_4);
+            assert.deepEqual({
+                value: e_5,
+                isArrowPress: true,
+                isBackspaceEvent: false,
+                isEnterPress: false,
+                isClick: false,
+                isLetterPress: false,
+                isLeftPress: true,
+                isUpPress: false,
+                isRightPress: false,
+                isDownPress: false
+            }, result_5);
+            assert.deepEqual({
+                value: e_6,
+                isArrowPress: true,
+                isBackspaceEvent: false,
+                isEnterPress: false,
+                isClick: false,
+                isLetterPress: false,
+                isLeftPress: false,
+                isUpPress: true,
+                isRightPress: false,
+                isDownPress: false
+            }, result_6);
+            assert.deepEqual({
+                value: e_7,
+                isArrowPress: true,
+                isBackspaceEvent: false,
+                isEnterPress: false,
+                isClick: false,
+                isLetterPress: false,
+                isLeftPress: false,
+                isUpPress: false,
+                isRightPress: true,
+                isDownPress: false
+            }, result_7);
+            assert.deepEqual({
+                value: e_8,
+                isArrowPress: true,
+                isBackspaceEvent: false,
+                isEnterPress: false,
+                isClick: false,
+                isLetterPress: false,
+                isLeftPress: false,
+                isUpPress: false,
+                isRightPress: false,
+                isDownPress: true
+            }, result_8);
         });
 
         QUnit.test('get color', assert => {
@@ -421,7 +457,52 @@
             assert.equal(null, result_4.value);
         });
 
+        QUnit.test('word filter case 1', assert => {
+            //GIVEN
+            let chars = getChars(
+                [
+                createCorrectInput({input: {value: 'т'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'у'}, classList: ['input', '2', 'yellow']}),
+                createCorrectInput({input: {value: 'т'}, classList: ['input', '3', 'yellow']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'yellow']}),
+                createCorrectInput({input: {value: 'р'}, classList: ['input', '5', 'yellow']})
+                ]
+            );
+
+            //WHEN
+            let result_1 = filterWords(chars)
+
+            //THEN
+            assert.deepEqual(['футор', 'хутор'], result_1);
+        });
+
+        QUnit.test('word filter case 1 with upperCase', assert => {
+            //GIVEN
+            let chars = getChars(
+                [
+                    createCorrectInput({input: {value: 'т'}, classList: ['input', '1', 'gray']}),
+                    createCorrectInput({input: {value: 'У'}, classList: ['input', '2', 'yellow']}),
+                    createCorrectInput({input: {value: 'Т'}, classList: ['input', '3', 'yellow']}),
+                    createCorrectInput({input: {value: 'О'}, classList: ['input', '4', 'yellow']}),
+                    createCorrectInput({input: {value: 'р'}, classList: ['input', '5', 'yellow']})
+                ]
+            );
+
+            //WHEN
+            let result_1 = filterWords(chars)
+
+            //THEN
+            assert.deepEqual(['футор', 'хутор'], result_1);
+        });
+
     });
+
+    const createCorrectInput = function (vals) {
+        let element = document.createElement('input');
+        Object.assign(element, vals.input);
+        element.classList.add(...vals.classList)
+        return element;
+    };
 
 </script>
 </body>

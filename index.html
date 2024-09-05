@@ -26,7 +26,7 @@
             width: 19px;
             height: 19px;
             text-align: center;
-            margin: 2px -2px 2px -2px;
+            margin: 2px 1px 2px 1px;
         }
 
         .add {
@@ -70,14 +70,7 @@
     </div>
     <div id="inputs">
         <label>Word: </label>
-        <div id="main">
-            <input type="text" maxlength="1" class="input 1 gray" oninput="onCharInput(this, event)" onclick="inputEvent(this, event)" onkeydown="inputEvent(this, event)">
-            <input type="text" maxlength="1" class="input 2 gray" oninput="onCharInput(this, event)" onclick="inputEvent(this, event)" onkeydown="inputEvent(this, event)">
-            <input type="text" maxlength="1" class="input 3 gray" oninput="onCharInput(this, event)" onclick="inputEvent(this, event)" onkeydown="inputEvent(this, event)">
-            <input type="text" maxlength="1" class="input 4 gray" oninput="onCharInput(this, event)" onclick="inputEvent(this, event)" onkeydown="inputEvent(this, event)">
-            <input type="text" maxlength="1" class="input 5 gray" oninput="onCharInput(this, event)" onclick="inputEvent(this, event)" onkeydown="inputEvent(this, event)">
-            <button class="add" onclick="addInput(document.getElementById('main'))">+</button>
-        </div>
+        <div id="main"><input maxlength="1" class="input 1 gray" onclick="inputEvent(this, event)" onkeyup="inputEvent(this, event)" autofocus><input maxlength="1" class="input 2 gray" onclick="inputEvent(this, event)" onkeyup="inputEvent(this, event)"><input maxlength="1" class="input 3 gray" onclick="inputEvent(this, event)" onkeyup="inputEvent(this, event)"><input maxlength="1" class="input 4 gray" onclick="inputEvent(this, event)" onkeyup="inputEvent(this, event)"><input maxlength="1" class="input 5 gray" onclick="inputEvent(this, event)" onkeyup="inputEvent(this, event)"><button class="add 6" onkeyup="buttonEvent(this, event)" onclick="addInput(document.getElementById('main'))">+</button></div>
     </div>
     <div id="words" style="margin-top: 1%"></div>
 </div>
