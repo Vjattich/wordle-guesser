@@ -126,26 +126,30 @@ const downInput = function (self) {
     return getInputSibling(self, false)
 };
 
+const walkie = function (self, event) {
+    let e;
+    if (event.isLeftPress) {
+        e = prevInput(self)
+    }
+    if (event.isRightPress) {
+        e = nextInput(self)
+    }
+    if (event.isUpPress) {
+        e = upInput(self)
+    }
+    if (event.isDownPress) {
+        e = downInput(self)
+    }
+    e.focus();
+};
+
 const inputEvent = function (e) {
 
     let self = this,
         event = toEvent(e);
 
     if (event.isArrowPress) {
-        let e;
-        if (event.isLeftPress) {
-            e = prevInput(self)
-        }
-        if (event.isRightPress) {
-            e = nextInput(self)
-        }
-        if (event.isUpPress) {
-            e = upInput(self)
-        }
-        if (event.isDownPress) {
-            e = downInput(self)
-        }
-        e.focus();
+        walkie(self, event)
     }
 
     if (self.value && (event.isEnterPress || event.isClick)) {
@@ -155,7 +159,6 @@ const inputEvent = function (e) {
 
     if (event.isLetterPress || event.isBackspaceEvent) {
         onCharInput()
-        debugger
         let element = event.isBackspaceEvent ? prevInput(self) : nextInput(self);
         element.focus()
     }
@@ -168,20 +171,7 @@ const buttonEvent = function (e) {
         event = toEvent(e);
 
     if (event.isArrowPress) {
-        let e;
-        if (event.isLeftPress) {
-            e = prevInput(self)
-        }
-        if (event.isRightPress) {
-            e = nextInput(self)
-        }
-        if (event.isUpPress) {
-            e = upInput(self)
-        }
-        if (event.isDownPress) {
-            e = downInput(self)
-        }
-        e.focus();
+        walkie(self, event)
     }
 
 }
@@ -191,9 +181,10 @@ const onClick = function (self) {
     self.classList.replace(colorClass, colors[colorClass]);
 }
 
-const addInput = function (main) {
+const addInput = function (e) {
 
-    let clone = main.cloneNode(true);
+    let main = e.target.parentElement,
+        clone = main.cloneNode(true);
 
     clone.childNodes.forEach(s => {
         s.value = null;
@@ -202,6 +193,8 @@ const addInput = function (main) {
     })
 
     main.parentNode.appendChild(clone);
+
+    addEvents()
 
     return clone;
 };
@@ -359,7 +352,7 @@ const changeWord = function (words) {
 };
 
 
-window.onload = function () {
+const addEvents = function () {
 
     let inputs = Array.from(document.getElementsByClassName('input'));
 
@@ -368,7 +361,7 @@ window.onload = function () {
         input.addEventListener("keyup", inputEvent)
     })
 
-    let buttons = Array.from(document.getElementsByClassName('button'));
+    let buttons = Array.from(document.getElementsByClassName('add'));
 
     buttons.forEach(button => {
         button.addEventListener("click", addInput)
@@ -376,3 +369,5 @@ window.onload = function () {
     })
 
 }
+
+window.onload = addEvents

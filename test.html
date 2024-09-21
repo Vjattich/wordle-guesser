@@ -183,6 +183,7 @@
         QUnit.test('add input test', assert => {
             //GIVEN
             let main = document.createElement('div')
+            main.id = "main";
 
             let inputChild_1 = document.createElement('input')
             inputChild_1.classList.add('input', '1', 'yellow')
@@ -202,14 +203,18 @@
             let inputs = document.createElement('div')
             inputs.appendChild(main);
 
+            let event = new Event('click');
+            Object.defineProperty(event, 'target', {writable: false, value: {parentElement: main}});
+
             //WHEN
-            addInput(main)
+            addInput(event)
 
             //THEN
             assert.equal(
                 10,
                 inputs.childNodes[0].childNodes.length + inputs.childNodes[1].childNodes.length
             );
+
         });
 
         QUnit.test('select prev input', assert => {
