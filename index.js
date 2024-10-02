@@ -47,14 +47,14 @@ const toElement = function (e) {
 const toEvent = function (e) {
     let arrowKeyCodes = [37, 38, 39, 40],
         indexOfKeyCode = arrowKeyCodes.indexOf(e.keyCode),
-        letters = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя',
-        val = (e.data || e.key)
+        val = e.keyCode;
+
     return {
         value: e,
         isBackspaceEvent: e.inputType === 'deleteContentBackward' || e.code === "Backspace",
         isEnterPress: e.keyCode === 13,
         isClick: e.type === 'click',
-        isLetterPress: val ? letters.indexOf(val.toLowerCase()) !== -1 : false,
+        isLetterPress: (val >= 65 && val <= 90) || (val >= 97 && val <= 122),
         isArrowPress: indexOfKeyCode !== -1,
         isLeftPress: indexOfKeyCode === 0,
         isUpPress: indexOfKeyCode === 1,
