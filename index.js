@@ -46,14 +46,15 @@ const toElement = function (e) {
 const toEvent = function (e) {
     let arrowKeyCodes = [37, 38, 39, 40],
         indexOfKeyCode = arrowKeyCodes.indexOf(e.keyCode),
-        val = e.keyCode || e.data;
+        val = e.key || e.keyCode || e.data,
+        letters = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
 
     return {
         value: e,
         isBackspaceEvent: e.inputType === 'deleteContentBackward' || e.code === "Backspace",
         isEnterPress: e.keyCode === 13,
         isClick: e.type === 'click',
-        isLetterPress: 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'.indexOf(val) !== -1,
+        isLetterPress: letters.indexOf(val) !== -1,
         isArrowPress: indexOfKeyCode !== -1,
         isLeftPress: indexOfKeyCode === 0,
         isUpPress: indexOfKeyCode === 1,
@@ -127,6 +128,9 @@ const downInput = function (self) {
 
 const walkie = function (self, event) {
     let e;
+    if (event.isBackspaceEvent) {
+        e = prevInput(self)
+    }
     if (event.isLeftPress) {
         e = prevInput(self)
     }
@@ -169,7 +173,7 @@ const buttonEvent = function (e) {
     let self = this,
         event = toEvent(e);
 
-    if (event.isArrowPress) {
+    if (event.isBackspaceEvent || event.isArrowPress) {
         walkie(self, event)
     }
 
@@ -227,27 +231,40 @@ const getChars = function (inputs) {
         }, {exact: new Set(), contains: new Set(), notContains: new Set()});
 }
 
-const notContainsChars = function (chars, exactChar) {
+const notContainsChars = function (chars, exactChar, containsChar) {
 
     let exact = Array.from(exactChar).reduce(function (acc, letter) {
         acc[letter.position] = letter.char;
         return acc
     }, []);
 
+    let contains = Array.from(containsChar).reduce(function (acc, letter) {
+        acc[letter.position] = letter.char;
+        return acc
+    }, []);
+
     let letters = Array.from(chars).reduce(function (acc, letter) {
 
         let accElement = acc[letter.position];
+
         for (let i = 1; i <= 5; i++) {
-            let excatPos = exact[i];
-
             let char = letter.char;
-            if (excatPos === char || (accElement && accElement.indexOf(char) > -1)) {
-                continue;
-            }
-
             acc[i] = accElement ? accElement + char : char;
         }
-        return acc
+
+        let exactChar = exact[letter.position];
+        if (exactChar) {
+            if (acc[letter.position].indexOf(exactChar) > -1) {
+                acc[letter.position] = acc[letter.position].remove(exactChar)
+            }
+        }
+
+        let containChar = contains[letter.position];
+        if (containChar) {
+            acc[letter.position] =  acc[letter.position] + containChar;
+        }
+
+        return acc;
     }, []);
 
     delete letters[0];
@@ -255,79 +272,30 @@ const notContainsChars = function (chars, exactChar) {
     let pat = [];
     for (let i = 1; i <= 5; i++) {
         let patternElement = letters[i];
+
+        console.log(i)
+
+        if (exact[i]) {
+            pat[i] = exact[i];
+            continue;
+        }
+
         pat[i] = patternElement ? "[^" + patternElement + "]" : '.';
     }
 
     const pattern = new RegExp(pat.join(''));
+
+    console.log(pattern)
 
     return function (word) {
         return pattern.test(word)
     };
 };
 
-const containsChars = function (chars) {
-
-    let letters = Array.from(chars).reduce(function (acc, letter) {
-        let accElement = acc[letter.position];
-        acc[letter.position] = accElement ? accElement + letter.char : letter.char;
-        return acc
-    }, []);
-
-    delete letters[0];
-
-    let pat = [];
-    for (let i = 1; i <= 5; i++) {
-        let patternElement = letters[i];
-        pat[i] = patternElement ? "[^" + patternElement + "]" : '.';
-    }
-
-    const pattern = new RegExp(pat.join(''));
-
-    return function (word) {
-        return pattern.test(word) && letters.every(ch => {
-
-            if (ch.length === 1) {
-                return word.indexOf(ch) !== -1;
-            }
-
-            if (ch.length > 1) {
-                let chars = ch.split('');
-
-                return chars.every(a => {
-                    return word.indexOf(a) !== -1;
-                });
-            }
-
-        });
-    };
-};
-
-const exactChar = function (chars) {
-
-    let pattern = Array.from(chars).reduce(function (acc, letter) {
-        acc[letter.position] = letter.char;
-        return acc
-    }, []);
-
-    delete pattern[0];
-
-    for (let i = 1; i <= 5; i++) {
-        let patternElement = pattern[i];
-        pattern[i] = patternElement ? patternElement : '.';
-    }
-
-    pattern = new RegExp(pattern.join(''));
-
-    return function (word) {
-        return pattern.test(word);
-    };
-};
 
 const filterWords = function (chars) {
     return words
-        .filter(notContainsChars(chars.notContains, chars.exact))
-        .filter(containsChars(chars.contains))
-        .filter(exactChar(chars.exact))
+        .filter(notContainsChars(chars.notContains, chars.exact, chars.contains))
 };
 
 const onCharInput = function () {
@@ -337,6 +305,7 @@ const onCharInput = function () {
     if (Array.from(inputs).filter(input => input.value).length === 0) {
         return;
     }
+
 
     let chars = getChars(inputs);
 

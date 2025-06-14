@@ -87,41 +87,11 @@
                 words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
 
             //WHEN
-            let result = notContainsChars(chars, new Set());
+            let result = notContainsChars(chars, new Set(), new Set());
 
             //THEN
             assert.deepEqual(
                 ['слово'],
-                words.filter(result)
-            );
-        });
-
-        QUnit.test('get words CONTAINS filter function', assert => {
-            //GIVEN
-            let chars = new Set([{char: 'а', position: '1'}, {char: 'т', position: '2'}]),
-                words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
-
-            //WHEN
-            let result = containsChars(chars);
-
-            //THEN
-            assert.deepEqual(
-                ['толпа'],
-                words.filter(result)
-            );
-        });
-
-        QUnit.test('get words EXACT filter function', assert => {
-            //GIVEN
-            let chars = new Set([{char: 'к', position: '4'}]),
-                words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
-
-            //WHEN
-            let result = exactChar(chars);
-
-            //THEN
-            assert.deepEqual(
-                ['палка'],
                 words.filter(result)
             );
         });
@@ -501,6 +471,51 @@
         });
 
     });
+
+
+    QUnit.test('word filter case 1 with upperCase', assert => {
+        //GIVEN
+        let chars = getChars(
+            [
+                createCorrectInput({input: {value: 'ш'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'л'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'ю'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'х'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'а'}, classList: ['input', '5', 'yellow']}),
+
+                createCorrectInput({input: {value: 'п'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'т'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'и'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'ц'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'а'}, classList: ['input', '5', 'yellow']}),
+
+                createCorrectInput({input: {value: 'с'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'к'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '3', 'white']}),
+                createCorrectInput({input: {value: 'б'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'а'}, classList: ['input', '5', 'yellow']}),
+
+                createCorrectInput({input: {value: 'г'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'р'}, classList: ['input', '2', 'white']}),
+                createCorrectInput({input: {value: 'ы'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'ж'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'а'}, classList: ['input', '5', 'yellow']}),
+
+                createCorrectInput({input: {value: 'ф'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'е'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'р'}, classList: ['input', '3', 'yellow']}),
+                createCorrectInput({input: {value: 'м'}, classList: ['input', '4', 'yellow']}),
+                createCorrectInput({input: {value: 'а'}, classList: ['input', '5', 'yellow']}),
+            ]
+        );
+
+        //WHEN
+        let result_1 = filterWords(chars)
+
+        //THEN
+        assert.deepEqual(['норма'], result_1);
+    });
+
 
     const createCorrectInput = function (vals) {
         let element = document.createElement('input');
