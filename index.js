@@ -285,8 +285,6 @@ const notContainsChars = function (chars, exactChar, containsChar) {
 
     const pattern = new RegExp(pat.join(''));
 
-    console.log(pattern)
-
     return function (word) {
         return pattern.test(word)
     };
