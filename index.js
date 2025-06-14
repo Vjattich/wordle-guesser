@@ -255,7 +255,7 @@ const notContainsChars = function (chars, exactChar, containsChar) {
         let exactChar = exact[letter.position];
         if (exactChar) {
             if (acc[letter.position].indexOf(exactChar) > -1) {
-                acc[letter.position] = acc[letter.position].remove(exactChar)
+                acc[letter.position] = acc[letter.position].replace(exactChar, '')
             }
         }
 
