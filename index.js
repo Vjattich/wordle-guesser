@@ -273,8 +273,6 @@ const notContainsChars = function (chars, exactChar, containsChar) {
     for (let i = 1; i <= 5; i++) {
         let patternElement = letters[i];
 
-        console.log(i)
-
         if (exact[i]) {
             pat[i] = exact[i];
             continue;
