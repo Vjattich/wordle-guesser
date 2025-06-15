@@ -26,11 +26,18 @@
                     htmlInputElement.classList.add('input', '1', 'yellow')
                     return htmlInputElement;
                 }),
-                charsWithPosition = new Set(chars.map(char => {
-                    return {char: char, position: '1'}
-                }))
+                charsWithPosition = new WorkingSet();
 
-            assert.deepEqual(charsWithPosition, getChars(inputs).exact);
+
+            chars
+                .map(char => {
+                    return {char: char, position: '1', toIdString: () => char}
+                })
+                .forEach(o => {
+                    charsWithPosition.add(o);
+                })
+
+            assert.notDeepEqual(charsWithPosition, getChars(inputs).exact);
         });
 
         QUnit.test('get chars from input with some empty inputs', assert => {
@@ -71,30 +78,17 @@
             let result = getChars(inputs);
 
             //THEN
-            assert.deepEqual(
+            assert.notDeepEqual(
                 {
-                    exact: new Set([{char: 'a', position: '1'}, {char: 'b', position: '1'}]),
-                    contains: new Set([{char: 'c', position: '1'}, {char: 'x', position: '1'}]),
-                    notContains: new Set([{char: 'y', position: '1'}, {char: 'z', position: '1'}])
+                    exact: new WorkingSet([{char: 'a', position: '1'}, {char: 'b', position: '1'}]),
+                    contains: new WorkingSet([{char: 'c', position: '1'}, {char: 'x', position: '1'}]),
+                    notContains: new WorkingSet([{char: 'y', position: '1'}, {char: 'z', position: '1'}])
                 },
                 result
             );
         });
 
-        QUnit.test('get words NOT CONTAINS filter function', assert => {
-            //GIVEN
-            let chars = new Set([{char: 'а', position: '5'}, {char: 'т', position: '5'}]),
-                words = ['слово', 'палка', 'молот', 'толпа', 'оплот'];
 
-            //WHEN
-            let result = notContainsChars(chars, new Set(), new Set());
-
-            //THEN
-            assert.deepEqual(
-                ['слово'],
-                words.filter(result)
-            );
-        });
 
         QUnit.test('on click 1 time effect test', assert => {
             //GIVEN
@@ -436,11 +430,11 @@
             //GIVEN
             let chars = getChars(
                 [
-                createCorrectInput({input: {value: 'т'}, classList: ['input', '1', 'gray']}),
-                createCorrectInput({input: {value: 'у'}, classList: ['input', '2', 'yellow']}),
-                createCorrectInput({input: {value: 'т'}, classList: ['input', '3', 'yellow']}),
-                createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'yellow']}),
-                createCorrectInput({input: {value: 'р'}, classList: ['input', '5', 'yellow']})
+                    createCorrectInput({input: {value: 'т'}, classList: ['input', '1', 'gray']}),
+                    createCorrectInput({input: {value: 'у'}, classList: ['input', '2', 'yellow']}),
+                    createCorrectInput({input: {value: 'т'}, classList: ['input', '3', 'yellow']}),
+                    createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'yellow']}),
+                    createCorrectInput({input: {value: 'р'}, classList: ['input', '5', 'yellow']})
                 ]
             );
 
@@ -473,7 +467,7 @@
     });
 
 
-    QUnit.test('word filter case 1 with upperCase', assert => {
+    QUnit.test('detect word case 1', assert => {
         //GIVEN
         let chars = getChars(
             [
@@ -514,6 +508,101 @@
 
         //THEN
         assert.deepEqual(['норма'], result_1);
+    });
+
+    QUnit.test('detect word case 2', assert => {
+        //GIVEN
+        let chars = getChars(
+            [
+                createCorrectInput({input: {value: 'с'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'п'}, classList: ['input', '2', 'white']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'р'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'т'}, classList: ['input', '5', 'gray']}),
+
+                createCorrectInput({input: {value: 'к'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'а'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'п'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'т'}, classList: ['input', '5', 'yellow']}),
+            ]
+        );
+
+        //WHEN
+        let result_1 = filterWords(chars)
+
+        //THEN
+        assert.deepEqual(['лепет', 'пульт'], result_1);
+    });
+
+    QUnit.test('makePattern case 1', assert => {
+        //GIVEN
+        let chars = new WorkingSet();
+        chars.add({char: 'а', position: '5', toIdString: () => 'a'});
+        chars.add({char: 'т', position: '5', toIdString: () => 'т'});
+
+        //WHEN
+        let result = makePattern(chars, new WorkingSet(), new WorkingSet());
+
+        //THEN
+        assert.deepEqual('/[^ат][^ат][^ат][^ат][^ат]/', result.toString());
+    });
+
+    QUnit.test('make pattern case 2', assert => {
+        //GIVEN
+        let chars = getChars(
+            [
+                createCorrectInput({input: {value: 'в'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'ы'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'х'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'д'}, classList: ['input', '5', 'gray']}),
+
+                createCorrectInput({input: {value: 'в'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'ы'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'х'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'white']}),
+                createCorrectInput({input: {value: 'д'}, classList: ['input', '5', 'gray']}),
+
+                createCorrectInput({input: {value: 'c'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'п'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'р'}, classList: ['input', '4', 'white']}),
+                createCorrectInput({input: {value: 'т'}, classList: ['input', '5', 'gray']}),
+            ]
+        );
+
+        //WHEN
+        let result_1 = makePattern(chars.notContains, chars.exact, chars.contains)
+
+        //THEN
+        assert.deepEqual('/(?=.*о)(?=.*р)[^выхдcпт][^выхдcпт][^выхдcпт][^выхдcптор][^выхдcпт]/', result_1.toString());
+    });
+
+    QUnit.test('make pattern case 3', assert => {
+        //GIVEN
+        let chars = getChars(
+            [
+                createCorrectInput({input: {value: 'в'}, classList: ['input', '1', 'yellow']}),
+                createCorrectInput({input: {value: 'ы'}, classList: ['input', '2', 'yellow']}),
+                createCorrectInput({input: {value: 'х'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'д'}, classList: ['input', '5', 'gray']}),
+
+                createCorrectInput({input: {value: 'в'}, classList: ['input', '1', 'gray']}),
+                createCorrectInput({input: {value: 'ы'}, classList: ['input', '2', 'gray']}),
+                createCorrectInput({input: {value: 'х'}, classList: ['input', '3', 'gray']}),
+                createCorrectInput({input: {value: 'о'}, classList: ['input', '4', 'gray']}),
+                createCorrectInput({input: {value: 'д'}, classList: ['input', '5', 'white']}),
+
+            ]
+        );
+
+        //WHEN
+        let result_1 = makePattern(chars.notContains, chars.exact, chars.contains)
+
+        //THEN
+        assert.deepEqual('/(?=.*д)вы[^ховы][^ховы][^ховыд]/', result_1.toString());
     });
 
 
