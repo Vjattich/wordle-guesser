@@ -88,14 +88,14 @@
             );
         });
 
-
-
         QUnit.test('on click 1 time effect test', assert => {
             //GIVEN
-            let input = document.createElement('input');
+            let main = document.createElement('div'),
+                div_1 = document.createElement('div'),
+                input = createCorrectInput({input: {value: 'а'}, classList: ['input', '1', 'gray']});
 
-            input.value = 'a'
-            input.classList.add('input', '1', 'gray')
+            main.append(div_1)
+            div_1.append(input)
 
             //WHEN
             onClick(input)
@@ -109,10 +109,12 @@
 
         QUnit.test('on click 2 time effect test', assert => {
             //GIVEN
-            let input = document.createElement('input');
+            let main = document.createElement('div'),
+                div_1 = document.createElement('div'),
+                input = createCorrectInput({input: {value: 'а'}, classList: ['input', '1', 'gray']});
 
-            input.value = 'a'
-            input.classList.add('input', '1', 'gray')
+            main.append(div_1)
+            div_1.append(input)
 
             //WHEN
             onClick(input)
@@ -127,10 +129,12 @@
 
         QUnit.test('on click 3 time effect test', assert => {
             //GIVEN
-            let input = document.createElement('input');
+            let main = document.createElement('div'),
+                div_1 = document.createElement('div'),
+                input = createCorrectInput({input: {value: 'а'}, classList: ['input', '1', 'gray']});
 
-            input.value = 'a'
-            input.classList.add('input', '1', 'gray')
+            main.append(div_1)
+            div_1.append(input)
 
             //WHEN
             onClick(input)
@@ -142,6 +146,33 @@
                 'gray',
                 input.classList[2]
             );
+        });
+
+        QUnit.test('on click 4 same letter in this column', assert => {
+            //GIVEN
+            let main = document.createElement('div'),
+                div_1 = document.createElement('div'),
+                div_2 = document.createElement('div'),
+                div_3 = document.createElement('div'),
+                input_1 = createCorrectInput({input: {value: 'в'}, classList: ['input', '1', 'gray']}),
+                input_2 = createCorrectInput({input: {value: 'в'}, classList: ['input', '1', 'gray']}),
+                input_3 = createCorrectInput({input: {value: 'з'}, classList: ['input', '1', 'gray']});
+
+            div_1.append(input_1)
+            div_2.append(input_2)
+            div_3.append(input_3)
+            main.append(div_1)
+            main.append(div_2)
+            main.append(div_3)
+
+
+            //WHEN
+            onClick(input_2)
+
+            //THEN
+            assert.equal('white', input_1.classList[2]);
+            assert.equal('white', input_2.classList[2]);
+            assert.equal('gray', input_3.classList[2]);
         });
 
         QUnit.test('add input test', assert => {

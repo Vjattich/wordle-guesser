@@ -202,8 +202,25 @@ const buttonEvent = function (e) {
 }
 
 const onClick = function (self) {
-    let colorClass = self.classList[2];
-    self.classList.replace(colorClass, colors[colorClass]);
+
+    let pos = self.classList[1],
+        colorClass = self.classList[2],
+        val = self.value;
+
+    Array.from(self.parentNode.parentNode.children)
+        .filter(e => e.tagName !== 'LABEL')
+        .reduce((acc, e) => {
+            let inputs = Array.from(e.children);
+            delete inputs[5];
+            acc.push(...inputs);
+            return acc;
+        }, [])
+        .filter(i => {
+           return i && (pos === i.classList[1] && val === i.value);
+        })
+        .forEach(i => {
+            i.classList.replace(colorClass, colors[colorClass]);
+        });
 }
 
 const addInput = function (e) {
