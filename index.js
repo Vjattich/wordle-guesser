@@ -185,6 +185,11 @@ const inputEvent = function (e) {
     if (event.isLetterPress || event.isBackspaceEvent) {
         onCharInput()
 
+        if (event.isBackspaceEvent  && !self.value) {
+            self.classList.replace('yellow', 'gray');
+            self.classList.replace('white', 'gray');
+        }
+
         if (self.value) {
 
             let val = self.value,
