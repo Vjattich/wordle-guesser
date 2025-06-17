@@ -184,6 +184,31 @@ const inputEvent = function (e) {
 
     if (event.isLetterPress || event.isBackspaceEvent) {
         onCharInput()
+
+        if (self.value) {
+
+            let val = self.value,
+                pos = self.classList[1];
+
+            //todo make static
+            let hasLetterWithColor = Array.from(self.parentNode.parentNode.children)
+                .filter(e => e.tagName !== 'LABEL')
+                .reduce((acc, e) => {
+                    let inputs = Array.from(e.children);
+                    delete inputs[5];
+                    acc.push(...inputs);
+                    return acc;
+                }, [])
+                .filter(i => {
+                    return i && (pos === i.classList[1] && val === i.value && i.classList[2] !== 'gray');
+                });
+
+            if (hasLetterWithColor.length > 0) {
+                let input = hasLetterWithColor[0];
+                self.classList.replace('gray', input.classList[2])
+            }
+
+        }
         let element = event.isBackspaceEvent ? prevInput(self) : nextInput(self);
         element.focus()
     }
@@ -372,7 +397,6 @@ const onCharInput = function () {
     if (Array.from(inputs).filter(input => input.value).length === 0) {
         return;
     }
-
 
     let chars = getChars(inputs);
 
