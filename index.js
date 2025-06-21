@@ -150,6 +150,9 @@ const downInput = function (self) {
 
 const walkie = function (self, event) {
     let e;
+    if (event.isEnterPress) {
+        e = nextInput(self)
+    }
     if (event.isBackspaceEvent) {
         e = prevInput(self)
     }
@@ -173,11 +176,13 @@ const inputEvent = function (e) {
     let self = this,
         event = toEvent(e);
 
-    if (event.isArrowPress) {
+    let isLastInput = event.isEnterPress && self.classList[1] === '5';
+    if (event.isArrowPress || isLastInput) {
         walkie(self, event)
+        return;
     }
 
-    if (self.value && (event.isEnterPress || event.isClick)) {
+    if (self.value && (event.isClick)) {
         onClick(self);
         onCharInput()
     }
@@ -267,6 +272,8 @@ const addInput = function (e) {
     main.parentNode.appendChild(clone);
 
     addEvents()
+
+    clone.childNodes[0].focus()
 
     return clone;
 };
