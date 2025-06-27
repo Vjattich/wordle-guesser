@@ -96,13 +96,19 @@ const getSibling = function (self, isNext) {
 
     if (!sibling) {
 
-        let prevParentNode = self.parentNode.previousElementSibling;
+        let parentNode = isNext ? self.parentNode.nextElementSibling : self.parentNode.previousElementSibling;
 
-        if (prevParentNode.tagName === 'LABEL') {
+        if (!parentNode) {
             return self;
         }
 
-        return prevParentNode.childNodes[prevParentNode.childNodes.length - 2];
+        if (parentNode.tagName === 'LABEL') {
+            return self;
+        }
+
+        let childNodes = parentNode.childNodes;
+
+        return childNodes[isNext ? 0 : childNodes.length - 1];
     }
 
     let element = toElement(sibling)
@@ -172,7 +178,7 @@ const walkie = function (self, event) {
     e.focus();
 };
 
-const keyUpEvent = function (e) {
+const keyDownEvent = function (e) {
 
     let self = this,
         event = toEvent(e);
@@ -180,6 +186,13 @@ const keyUpEvent = function (e) {
     if ((event.isBackspaceEvent && !self.value) || event.isArrowPress) {
         mainEvent.call(self, event);
     }
+
+};
+
+const keyUpEvent = function (e) {
+
+    let self = this,
+        event = toEvent(e);
 
     if (event.isLetterPress && self.value) {
         let next = nextInput(self);
@@ -210,6 +223,7 @@ const mainEvent = function (event) {
     if (self.value && event.isClick) {
         onClick(self);
         onCharInput();
+        return;
     }
 
     if (event.isLetterPress || event.isBackspaceEvent) {
@@ -248,22 +262,22 @@ const mainEvent = function (event) {
         element.focus()
     }
 
-    if (isLastInput) {
+    if (event.isLetterPress && isLastInput && hasNotEmptyInput(self)) {
         addInput(event.value)
     }
 
 };
 
-const buttonEvent = function (e) {
+const hasNotEmptyInput = function (self) {
 
-    let self = this,
-        event = toEvent(e);
+    let next = nextInput(self);
 
-    if (event.isBackspaceEvent || event.isArrowPress) {
-        walkie(self, event)
+    if (self.compareDocumentPosition(next) === 0) {
+        return true;
     }
 
-}
+    return !!next.value;
+};
 
 const onClick = function (self) {
 
@@ -459,7 +473,14 @@ const addEvents = function () {
     inputs.forEach(input => {
         input.addEventListener("click", inputEvent)
         input.addEventListener("input", inputEvent)
+        input.addEventListener("keydown", keyDownEvent)
         input.addEventListener("keyup", keyUpEvent)
+        input.addEventListener("focus", function () {
+            setTimeout(() => {
+                const length = this.value.length;
+                this.setSelectionRange(length, length);
+            }, 0);
+        });
     })
 
 }
