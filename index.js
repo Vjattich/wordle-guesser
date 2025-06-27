@@ -178,7 +178,7 @@ const walkie = function (self, event) {
     e.focus();
 };
 
-const keyPressEvent = function (e) {
+const keyDownEvent = function (e) {
 
     let self = this,
         event = toEvent(e);
@@ -473,7 +473,7 @@ const addEvents = function () {
     inputs.forEach(input => {
         input.addEventListener("click", inputEvent)
         input.addEventListener("input", inputEvent)
-        input.addEventListener("keypress", keyPressEvent)
+        input.addEventListener("keydown", keyDownEvent)
         input.addEventListener("keyup", keyUpEvent)
         input.addEventListener("focus", function () {
             setTimeout(() => {
