@@ -462,13 +462,6 @@ const addEvents = function () {
         input.addEventListener("keyup", keyUpEvent)
     })
 
-    let buttons = Array.from(document.getElementsByClassName('add'));
-
-    buttons.forEach(button => {
-        button.addEventListener("click", addInput)
-        button.addEventListener("keyup", buttonEvent)
-    })
-
 }
 
 window.onload = addEvents
