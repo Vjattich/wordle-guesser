@@ -72,6 +72,7 @@ const toEvent = function (e) {
         letters = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
 
     return {
+        val: val,
         value: e,
         isBackspaceEvent: e.inputType === 'deleteContentBackward' || e.code === "Backspace",
         isEnterPress: e.keyCode === 13,
@@ -171,18 +172,42 @@ const walkie = function (self, event) {
     e.focus();
 };
 
-const inputEvent = function (e) {
+const keyUpEvent = function (e) {
 
     let self = this,
         event = toEvent(e);
 
+    if ((event.isBackspaceEvent && !self.value) || event.isArrowPress) {
+        mainEvent.call(self, event);
+    }
+
+    if (event.isLetterPress && self.value) {
+        let next = nextInput(self);
+        next.value = event.val
+        mainEvent.call(next, event);
+    }
+
+};
+
+const inputEvent = function (e) {
+    let self = this,
+        event = toEvent(e);
+
+    mainEvent.call(self, event);
+};
+
+const mainEvent = function (event) {
+
+    let self = this;
+
     let isLastInput = event.isEnterPress && self.classList[1] === '5';
+
     if (event.isArrowPress || isLastInput) {
         walkie(self, event)
         return;
     }
 
-    if (self.value && (event.isClick)) {
+    if (self.value && event.isClick) {
         onClick(self);
         onCharInput()
     }
@@ -429,7 +454,8 @@ const addEvents = function () {
 
     inputs.forEach(input => {
         input.addEventListener("click", inputEvent)
-        input.addEventListener("keyup", inputEvent)
+        input.addEventListener("input", inputEvent)
+        input.addEventListener("keyup", keyUpEvent)
     })
 
     let buttons = Array.from(document.getElementsByClassName('add'));
