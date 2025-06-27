@@ -74,7 +74,7 @@ const toEvent = function (e) {
     return {
         val: val,
         value: e,
-        isBackspaceEvent: e.inputType === 'deleteContentBackward' || e.code === "Backspace",
+        isBackspaceEvent: e.inputType === 'deleteContentBackward' || e.code === "Backspace" || e.key === 'Backspace',
         isEnterPress: e.keyCode === 13,
         isClick: e.type === 'click',
         isLetterPress: letters.indexOf(val) !== -1,
