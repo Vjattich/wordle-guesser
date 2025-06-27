@@ -198,18 +198,18 @@ const inputEvent = function (e) {
 
 const mainEvent = function (event) {
 
-    let self = this;
+    let self = this,
+        isLastInput = self.classList[1] === '5',
+        isLastEnterPress = event.isEnterPress && isLastInput;
 
-    let isLastInput = event.isEnterPress && self.classList[1] === '5';
-
-    if (event.isArrowPress || isLastInput) {
-        walkie(self, event)
+    if (event.isArrowPress || isLastEnterPress) {
+        walkie(self, event);
         return;
     }
 
     if (self.value && event.isClick) {
         onClick(self);
-        onCharInput()
+        onCharInput();
     }
 
     if (event.isLetterPress || event.isBackspaceEvent) {
@@ -246,6 +246,10 @@ const mainEvent = function (event) {
         }
         let element = event.isBackspaceEvent ? prevInput(self) : nextInput(self);
         element.focus()
+    }
+
+    if (isLastInput) {
+        addInput(event.value)
     }
 
 };
