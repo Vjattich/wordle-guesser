@@ -187,7 +187,7 @@ const keyDownEvent = function (e) {
     if ((event.isLetterPress || event.isUnidentified) && self.value) {
         event.isKeyDown = true;
         let next = nextInput(self);
-        next.value = event.val
+        next.value = event.isUnidentified ? self.value[self.value.length - 1] : event.val;
         next.focus();
     }
 
