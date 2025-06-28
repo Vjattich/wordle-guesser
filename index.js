@@ -182,13 +182,15 @@ const keyDownEvent = function (e) {
 
     if ((event.isBackspaceEvent && !self.value) || event.isArrowPress) {
         mainEvent.call(self, event);
+        return;
     }
 
-    if ((event.isLetterPress || event.isUnidentified) && self.value) {
+    if (event.isLetterPress && self.value) {
         event.isKeyDown = true;
         let next = nextInput(self);
-        next.value = event.isUnidentified ? self.value[self.value.length - 1] : event.val;
+        next.value = event.val;
         next.focus();
+        return;
     }
 
 };
