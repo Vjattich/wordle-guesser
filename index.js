@@ -74,6 +74,7 @@ const toEvent = function (e) {
         isEnterPress: e.keyCode === 13,
         isClick: e.type === 'click',
         isLetterPress: letters.indexOf(val) !== -1,
+        isUnidentified: e.key === 'Unidentified',
         isArrowPress: indexOfKeyCode !== -1,
         isLeftPress: indexOfKeyCode === 0,
         isUpPress: indexOfKeyCode === 1,
@@ -183,7 +184,7 @@ const keyDownEvent = function (e) {
         mainEvent.call(self, event);
     }
 
-    if (event.isLetterPress && self.value) {
+    if ((event.isLetterPress || event.isUnidentified) && self.value) {
         event.isKeyDown = true;
         let next = nextInput(self);
         next.value = event.val
