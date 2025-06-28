@@ -181,12 +181,13 @@ const keyDownEvent = function (e) {
         event = toEvent(e);
 
     if ((event.isBackspaceEvent && !self.value) || event.isArrowPress) {
+        let prev = prevInput(self);
+        prev.focus();
         mainEvent.call(self, event);
         return;
     }
 
     if (event.isLetterPress && self.value) {
-        event.isKeyDown = true;
         let next = nextInput(self);
         next.value = event.val;
         next.focus();
@@ -263,16 +264,10 @@ const mainEvent = function (event) {
                 self.classList.replace('gray', input.classList[2])
             }
 
-            if (self.value.length > 1) {
-                self.value = self.value[0];
-                let next = nextInput(self);
-                next.value = self.value[1];
-                next.focus();
-            }
-
         }
-        let element = event.isBackspaceEvent ? prevInput(self) : nextInput(self);
-        element.focus()
+        if (!event.isBackspaceEvent) {
+            nextInput(self).focus();
+        }
     }
 
     if (event.isLetterPress && isLastInput && hasNotEmptyInput(self)) {
