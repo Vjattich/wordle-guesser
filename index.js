@@ -263,6 +263,13 @@ const mainEvent = function (event) {
                 self.classList.replace('gray', input.classList[2])
             }
 
+            if (self.value.length > 1) {
+                self.value = self.value[0];
+                let next = nextInput(self);
+                next.value = self.value[1];
+                next.focus();
+            }
+
         }
         let element = event.isBackspaceEvent ? prevInput(self) : nextInput(self);
         element.focus()
